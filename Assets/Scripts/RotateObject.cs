@@ -15,6 +15,7 @@ public class RotateObject: MonoBehaviour
         public float value { get; set; }
         public string axis { get; set; }
         public string object_to_replace { get; set; }
+        public string reference_object { get; set; }
         public string direction { get; set; }
     }
     public class Prompt
@@ -136,7 +137,7 @@ public class RotateObject: MonoBehaviour
                         }
                     }else if(prefab.action == "move")
                     {
-                        GameObject objectPrefab = GameObject.Find("Cube");
+                        GameObject objectPrefab = GameObject.Find(prefab.parameters.prefab);
 
                         Renderer rend = objectPrefab.GetComponent<Renderer>();
 
@@ -179,6 +180,59 @@ public class RotateObject: MonoBehaviour
                         {
                             Debug.LogError("Renderer component not found on the prefab.");
                         }
+                    }else if (prefab.action == "insert")
+                    {
+                        GameObject objectPrefab = GameObject.Find(prefab.parameters.reference_object);
+
+                        Renderer rend = objectPrefab.GetComponent<Renderer>();
+
+                        if (rend != null)
+                        {
+                            Bounds bounds = rend.bounds;
+
+                            float left = bounds.min.x;
+                            float right = bounds.max.x;
+                            float top = bounds.max.y;
+                            float bottom = bounds.min.y;
+                            
+                            Debug.Log("Left: " + left + ", Right: " + right + ", Top: " + top + ", Bottom: " + bottom);   
+   
+                            switch (prefab.parameters.direction)
+                            {
+                                case "left":
+                                    GameObject spawnLeftPrefab = Resources.Load<GameObject>(prefab.parameters.prefab);
+                                    Instantiate(spawnLeftPrefab, Vector3.left * prefab.parameters.value, Quaternion.identity);
+                                    Debug.Log("passed");
+                                    break;
+                                case "right":
+                                    GameObject spawnRightPrefab = Resources.Load<GameObject>(prefab.parameters.prefab);
+                                    Instantiate(spawnRightPrefab, Vector3.right * prefab.parameters.value, Quaternion.identity);
+                                    Debug.Log("passed");
+                                    break;
+                                case "front":
+                                    GameObject spawnFrontPrefab = Resources.Load<GameObject>(prefab.parameters.prefab);
+                                    Instantiate(spawnFrontPrefab, Vector3.forward * prefab.parameters.value, Quaternion.identity);
+                                    Debug.Log("passed");
+                                    break;
+                                case "back":
+                                    GameObject spawnBackPrefab = Resources.Load<GameObject>(prefab.parameters.prefab);
+                                    Instantiate(spawnBackPrefab, Vector3.back * prefab.parameters.value, Quaternion.identity);
+                                    Debug.Log("passed");
+                                    break;
+                                case "top":
+                                    GameObject spawnTopPrefab = Resources.Load<GameObject>(prefab.parameters.prefab);
+                                    Instantiate(spawnTopPrefab, Vector3.up * prefab.parameters.value, Quaternion.identity);
+                                    Debug.Log("passed");
+                                    break;
+                                case "bottom":
+                                    GameObject spawnBottomPrefab = Resources.Load<GameObject>(prefab.parameters.prefab);
+                                    Instantiate(spawnBottomPrefab, Vector3.down * prefab.parameters.value, Quaternion.identity);
+                                    Debug.Log("passed");
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
                     }
                     Debug.Log("Success | Object Name: " + prefab.parameters.prefab);
                 break;
@@ -191,7 +245,7 @@ public class RotateObject: MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            StartCoroutine(GetRequestRotate("http://127.0.0.1:5000/move"));
+            StartCoroutine(GetRequestRotate("http://127.0.0.1:5000/insert"));
         }
     }
 }
